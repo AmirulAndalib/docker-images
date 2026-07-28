@@ -134,7 +134,7 @@ RUN set -x \
  && echo "admin:admin" | chpasswd \
  && adduser admin sudo \
  && echo "admin ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers \
- && if [ $(grep -c 'admin.*1000' /etc/group) == "0" ] ; then echo "Admin user does not have UID 1000" ; exit 1 ; fi \
+ && if [ "$(grep -c 'admin.*1000' /etc/group)" = "0" ] ; then echo "Admin user does not have UID 1000" ; exit 1 ; fi \
 # Configure sshd
  && mkdir -p /var/run/sshd \
  && mv /tmp/sshd_config /etc/ssh/sshd_config \
@@ -174,7 +174,7 @@ RUN set -x \
  && git lfs install \
  && git config --global filter.lfs.smudge "git-lfs smudge -- %f" \
 # Install JFrog CLI only fo x84_64
- && if [ $(uname -m) == "x86_64" ] ; then \
+ && if [ "$(uname -m)" = "x86_64" ] ; then \
        wget -qO - https://releases.jfrog.io/artifactory/jfrog-gpg-public/jfrog_public_gpg.key | sudo apt-key add - \
     && echo "deb https://releases.jfrog.io/artifactory/jfrog-debs xenial contrib" | sudo tee -a /etc/apt/sources.list \
     && sudo apt-get update \
