@@ -175,8 +175,8 @@ RUN set -x \
  && git config --global filter.lfs.smudge "git-lfs smudge -- %f" \
 # Install JFrog CLI only fo x84_64
  && if [ "$(uname -m)" = "x86_64" ] ; then \
-       wget -qO - https://releases.jfrog.io/artifactory/jfrog-gpg-public/jfrog_public_gpg.key | sudo apt-key add - \
-    && echo "deb https://releases.jfrog.io/artifactory/jfrog-debs xenial contrib" | sudo tee -a /etc/apt/sources.list \
+       curl -fsSL https://releases.jfrog.io/artifactory/api/gpg/key/public | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/artifactory.gpg \
+    && echo "deb https://releases.jfrog.io/artifactory/artifactory-debs focal main" | sudo tee /etc/apt/sources.list.d/artifactory.list \
     && sudo apt-get update \
     && sudo apt-get install -y \
             jfrog-cli \
