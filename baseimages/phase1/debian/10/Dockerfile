@@ -1,27 +1,5 @@
 # Copyright (c) 2016-2026 Crave.io Inc. All rights reserved
 
-# Compile remake on the fly and keep it ready for the next stage
-## Chicken or egg : Which came first?
-FROM debian:10 AS remake
-RUN set -x \
- && sed -s 's|http://deb.debian.org/debian|http://archive.debian.org/debian|g' </etc/apt/sources.list >/tmp/sources.list \
- && mv /tmp/sources.list /etc/apt/sources.list \
- && apt-get update \
- && apt-get install -y \
-       autoconf \
-       autopoint \
-       build-essential \
-       git \
-       guile-2.2-dev \
-       pkg-config \
-       rsync \
-       texinfo \
- && git clone https://github.com/rocky/remake.git \
- && cd remake \
- && ./autogen.sh \
- && make -j `nproc` \
- && mv ./make /tmp/
-
 FROM debian:10 AS rsync
 RUN set -x \
  && sed -s 's|http://deb.debian.org/debian|http://archive.debian.org/debian|g' </etc/apt/sources.list >/tmp/sources.list \
@@ -188,7 +166,6 @@ RUN set -x \
  && sudo rm -f /var/lib/apt/lists/*_dists_*
 
 # Copy these at the very end
-COPY --from=remake /tmp/make /usr/bin/remake
 COPY --from=rsync  /tmp/rsync/bin/rsync /tmp/rsync/bin/rsync-ssl /usr/bin/
 
 EXPOSE 22

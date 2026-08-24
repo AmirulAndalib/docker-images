@@ -1,25 +1,5 @@
 # Copyright (c) 2016-2026 Crave.io Inc. All rights reserved
 
-FROM ubuntu:18.04 AS remake
-RUN set -x \
- && apt-get update \
- && apt-get install -y \
-      autoconf \
-      autopoint \
-      binutils \
-      build-essential \
-      guile-2.2-dev \
-      texinfo \
-      wget \
- && wget -q https://github.com/Trepan-Debuggers/remake/archive/refs/tags/remake-4.3+dbg-1.6.tar.gz -O remake.tar.gz \
- && tar -xf remake.tar.gz \
- && mv remake-remake-4.3-dbg-1.6 remake \
- && cd remake \
- && ./autogen.sh \
- && ./configure \
- && make -j `nproc` \
- && mv ./make /tmp/
-
 # The binary generated from this step works in centos 6 and 7, and ubuntu 14.04,16.04,18.04,20.04. It does not work in 22.04
 FROM ubuntu:18.04 AS rsync
 RUN set -x \
@@ -202,7 +182,6 @@ RUN set -x \
  && sudo rm -f /var/lib/apt/lists/*_dists_*
 
 # Copy these at the very end
-COPY --from=remake /tmp/make /usr/bin/remake
 COPY --from=rsync  /tmp/rsync/bin/rsync /tmp/rsync/bin/rsync-ssl /usr/bin/
 
 EXPOSE 22

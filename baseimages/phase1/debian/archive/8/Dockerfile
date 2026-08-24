@@ -1,33 +1,5 @@
 # Copyright (c) 2016-2026 Crave.io Inc. All rights reserved
 
-# Compile remake on the fly and keep it ready for the next stage
-## Chicken or egg : Which came first?
-FROM accupara/debian:8 AS remake
-RUN set -x \
- && sudo sed -i 's/deb.debian.org/archive.debian.org/g' /etc/apt/sources.list \
- && sudo apt-get -o Acquire::Check-Valid-Until=false update \
- && sudo apt-get install -y --force-yes \
-        autoconf \
-        autopoint \
-        git \
-        guile-2.0-dev \
-        rsync \
-        texinfo \
-        wget \
-# Fetch gettext sources and compile them
- && wget -q --no-check-certificate https://ftp.gnu.org/pub/gnu/gettext/gettext-0.21.tar.gz \
- && tar -xf gettext-0.21.tar.gz \
- && cd gettext-0.21 \
- && ./configure \
- && make -j `nproc` \
- && sudo make install \
-# Get the remake sources for 4.3 and compile them
- && git clone https://github.com/rocky/remake.git remake \
- && cd remake \
- && ./autogen.sh --enable-maintainer-mode \
- && make -j `nproc` \
- && mv ./make /tmp/
-
 # The binary generated from this step works in centos 6 and 7, and ubuntu 14.04,16.04,18.04,20.04. It does not work in 22.04
 FROM accupara/centos:6 AS rsync
 RUN set -x \
@@ -148,7 +120,6 @@ RUN set -x \
  && echo "export LANGUAGE=en_US.UTF-8" >> /home/admin/.bashrc
 
 # Copy these at the very end
-COPY --from=remake /tmp/make /usr/bin/remake
 COPY --from=rsync  /tmp/rsync/bin/rsync /tmp/rsync/bin/rsync-ssl /usr/bin/
 
 EXPOSE 22

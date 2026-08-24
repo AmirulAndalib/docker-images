@@ -1,31 +1,5 @@
 # Copyright (c) 2016-2026 Crave.io Inc. All rights reserved
 
-FROM ubuntu:22.04 AS remake
-COPY tzdata.exp /tmp/
-RUN set -x \
- && apt-get update \
- && apt-get install -y expect \
- && expect /tmp/tzdata.exp \
- && apt-get install -y \
-      autoconf \
-      autopoint \
-      binutils \
-      build-essential \
-      git \
-      guile-3.0-dev \
-      texinfo \
-      wget \
- && wget -q https://github.com/Trepan-Debuggers/remake/archive/refs/tags/remake-4.3+dbg-1.6.tar.gz -O remake.tar.gz \
- && tar -xf remake.tar.gz \
- && mv remake-remake-4.3-dbg-1.6 remake \
- && cd remake \
- && ./autogen.sh \
- && ./configure \
-# Get rid of the pot files
- && sed -i -s 's/SUBDIRS\(.*\) po \(.*\)/SUBDIRS\1 \2/g' Makefile \
- && make -j `nproc` \
- && mv ./make /tmp/
-
 ################## The real container starts here ##################
 FROM ubuntu:22.04
 LABEL org.opencontainers.image.author.name="Crave.io Inc." \
@@ -185,7 +159,5 @@ RUN set -x \
 # Cleanup
  && sudo apt-get clean \
  && sudo rm -f /var/lib/apt/lists/*_dists_*
-
-COPY --from=remake /tmp/make /usr/bin/remake
 
 EXPOSE 22

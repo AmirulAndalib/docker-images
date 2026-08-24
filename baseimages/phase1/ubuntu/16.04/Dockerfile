@@ -1,27 +1,5 @@
 # Copyright (c) 2016-2026 Crave.io Inc. All rights reserved
 
-# Compile remake and rsync on the fly and keep it ready for the next stage
-# Chicken or egg : Which came first?
-FROM ubuntu:16.04 AS remake
-RUN set -x \
- && export DEBIAN_FRONTEND=noninteractive \
- && apt-get update \
- && apt-get install -y \
-      autoconf \
-      autopoint \
-      build-essential \
-      git \
-      guile-2.0-dev \
-      pkg-config \
-      rsync \
-      texinfo \
- && git clone https://github.com/rocky/remake.git \
- && cd remake \
- && ./autogen.sh \
- && ./configure \
- && make -j `nproc` \
- && mv ./make /tmp/
-
 FROM ubuntu:16.04 AS rsync
 RUN set -x \
  && export DEBIAN_FRONTEND=noninteractive \
@@ -267,7 +245,6 @@ RUN set -x \
  && sudo rm -f /var/lib/apt/lists/*_dists_*
 
 # Copy these at the very end
-COPY --from=remake /tmp/make /usr/bin/remake
 COPY --from=rsync  /tmp/rsync/bin/rsync /tmp/rsync/bin/rsync-ssl /usr/bin/
 
 EXPOSE 22

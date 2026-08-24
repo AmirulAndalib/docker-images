@@ -1,36 +1,5 @@
 # Copyright (c) 2016-2026 Crave.io Inc. All rights reserved
 
-# Compile remake and rsync on the fly and keep it ready for the next stage
-# Chicken or egg : Which came first?
-FROM ubuntu:14.04 AS remake
-RUN set -x \
- && export DEBIAN_FRONTEND=noninteractive \
- && apt-get update \
- && apt-get install -y \
-      autoconf \
-      autopoint \
-      build-essential \
-      git \
-      guile-2.0-dev \
-      pkg-config \
-      rsync \
-      texinfo \
-      wget \
-# Fetch gettext sources and compile them
- && wget -q --no-check-certificate https://ftp.gnu.org/pub/gnu/gettext/gettext-0.21.tar.gz \
- && tar -xf gettext-0.21.tar.gz \
- && cd gettext-0.21 \
- && ./configure \
- && make -j `nproc` \
- && make install \
-# Get the remake sources for 4.3 and compile them
- && git clone https://github.com/rocky/remake.git remake \
- && cd remake \
- && ./autogen.sh \
- && ./configure --enable-maintainer-mode \
- && make -j `nproc` \
- && mv ./make /tmp/
-
 FROM ubuntu:14.04 AS rsync
 RUN set -x \
  && export DEBIAN_FRONTEND=noninteractive \
@@ -250,7 +219,6 @@ RUN set -x \
  && sudo rm -f /var/lib/apt/lists/*_dists_*
 
 # Copy these at the very end
-COPY --from=remake /tmp/make /usr/bin/remake
 COPY --from=rsync  /tmp/rsync/bin/rsync /tmp/rsync/bin/rsync-ssl /usr/bin/
 
 EXPOSE 22

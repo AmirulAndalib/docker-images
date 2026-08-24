@@ -1,48 +1,5 @@
 # Copyright (c) 2016-2026 Crave.io Inc. All rights reserved
 
-# Compile remake on the fly and keep it ready for the next stage
-## Chicken or egg : Which came first?
-FROM rockylinux:8 AS remake
-RUN set -x \
- && dnf update -y \
- && dnf install -y 'dnf-command(config-manager)' \
- && dnf config-manager --enable devel \
- && dnf config-manager --enable extras \
- && dnf config-manager --enable plus \
- && dnf update -y \
- && dnf group install -y "Development Tools" \
- && dnf install -y \
-    flex \
-    glibc-devel \
-    gettext-devel \
-    guile-devel \
-    libgcc \
-    perl \
-    readline-devel \
-    rsync \
-    svn \
-    texinfo \
-    texinfo-tex \
-    wget \
-    zip \
-# Download and install automake
- && cd /tmp \
- && wget -q --no-check-certificate https://ftp.gnu.org/gnu/automake/automake-1.16.5.tar.gz \
- && tar -xf automake-1.16.5.tar.gz \
- && cd automake-1.16.5 \
- && ./configure --prefix=/usr \
- && make -j `nproc` \
- && make install \
-# Get the remake sources for 4.3 and compile them
- && cd /tmp \
- && git clone https://github.com/rocky/remake.git remake \
- && cd remake \
- && ./autogen.sh \
-# Get rid of the pot files
- && sed -i -s 's/SUBDIRS\(.*\) po \(.*\)/SUBDIRS\1 \2/g' Makefile \
- && make -j `nproc` \
- && mv ./make /tmp/
-
 FROM rockylinux:8 AS rsync
 RUN set -x \
  && dnf update -y \
@@ -197,7 +154,6 @@ RUN chown -R admin:admin /home/admin \
  && cd /tmp ; rm -rf git-${GIT_VER}*
 
 # Copy these at the very end
-COPY --from=remake /tmp/make /usr/bin/remake
 COPY --from=rsync  /tmp/rsync/bin/rsync /tmp/rsync/bin/rsync-ssl /usr/bin/
 
 EXPOSE 22

@@ -1,26 +1,5 @@
 # Copyright (c) 2016-2026 Crave.io Inc. All rights reserved
 
-# Compile remake on the fly and keep it ready for the next stage
-FROM debian:11 AS remake
-RUN set -x \
- && apt-get update \
- && apt-get install -y \
-       autoconf \
-       autopoint \
-       build-essential \
-       guile-2.2-dev \
-       pkg-config \
-       rsync \
-       texinfo \
-       wget \
- && wget -q https://github.com/Trepan-Debuggers/remake/archive/refs/tags/remake-4.3+dbg-1.6.tar.gz -O remake.tar.gz \
- && tar -xf remake.tar.gz \
- && mv remake-remake-4.3-dbg-1.6 remake \
- && cd remake \
- && ./autogen.sh \
- && make -j `nproc` \
- && mv ./make /tmp/
-
 FROM debian:11 AS rsync
 RUN set -x \
  && apt-get update -y \
@@ -184,7 +163,6 @@ RUN set -x \
  && sudo rm -f /var/lib/apt/lists/*_dists_*
 
 # Copy these at the very end
-COPY --from=remake /tmp/make /usr/bin/remake
 COPY --from=rsync  /tmp/rsync/bin/rsync /tmp/rsync/bin/rsync-ssl /usr/bin/
 
 EXPOSE 22
