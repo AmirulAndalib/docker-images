@@ -5,8 +5,16 @@ FROM accupara/qt6:ubuntu_2404
 RUN set -x \
  && sudo apt-get update \
  && sudo apt-get install -y \
+        libegl-dev \
         libgl-dev \
         libopengl-dev \
+        libnss3 \
+        libnspr4 \
+        libevent-dev \
+        libopus-dev \
+        libwebp-dev \
+        libsnappy-dev \
+        libminizip-dev \
         perl \
 # Clean up image
  && sudo apt-get clean \
