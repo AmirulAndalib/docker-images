@@ -2,8 +2,9 @@
 FROM accupara/ubuntu:24.04
 
 # Cmake: https://cmake.org/download/
+# Clang / LLVM: https://apt.llvm.org
 ENV CMAKE_VER=4.1.1 \
-    LLVM_VER=20 \
+    LLVM_VER=21 \
     CC=clang \
     CXX=clang++
 
